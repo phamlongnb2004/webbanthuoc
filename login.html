@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Đăng nhập</title>
+  <link rel="stylesheet" href="./css/login.css">
+</head>
+
+<body>
+
+  <form>
+    <h2>Đăng nhập</h2>
+    <div>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email">
+      <p class="error-message" id="email-error"></p>
+    </div>
+    <div>
+      <label for="password">Mật khẩu:</label>
+      <input type="password" id="password" name="password">
+      <p class="error-message" id="password-error"></p>
+    </div>
+    <button type="submit">Đăng nhập</button>
+    <p>Chưa có tài khoản? <a href="register.html">Đăng ký</a></p>
+  </form>
+
+  <script>
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const errorMessages = document.querySelectorAll('.error-message');
+
+    function displayError(input, message) {
+      const errorMessage = input.nextElementSibling;
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+    }
+    
+    function hideError(input) {
+      const errorMessage = input.nextElementSibling;
+      errorMessage.textContent = '';
+      errorMessage.style.display = 'none';
+    }
+
+    function validateForm() {
+      let isValid = true;
+      if (emailInput.value === '') {
+        displayError(emailInput, 'Vui lòng nhập email');
+        isValid = false;
+      } else {
+        const regex = /^\S+@\S+\.\S{2,}$/;
+        if (!regex.test(emailInput.value)) {
+          displayError(emailInput, 'Email không hợp lệ');
+          isValid = false;
+        } else {
+          hideError(emailInput);
+        }
+      }
+      if (passwordInput.value === '') {
+        displayError(passwordInput, 'Vui lòng nhập mật khẩu');
+        isValid = false;
+      } else {
+        hideError(passwordInput);
+      }
+      return isValid;
+    }
+
+    document.querySelector('form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (validateForm()) {
+        const loginData = {
+          email: emailInput.value,
+          password: passwordInput.value
+        };
+        fetch('YOUR_BACKEND_LOGIN_URL', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(loginData)
+          })
+          .then(response => {
+            if (response.ok) {
+              console.log('Đăng nhập thành công!');
+            } else {
+              console.error('Đăng nhập thất bại!');
+            }
+          })
+          .catch(error => {
+            console.error('Đăng nhập thất bại:', error);
+          })
+          .finally(() => {
+            emailInput.value = '';
+            passwordInput.value = '';
+          });
+      }
+    });
+  </script>
+
+</body>
+
+</html>

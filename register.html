@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Đăng ký</title>
+  <link rel="stylesheet" href="./css/register.css">
+</head>
+
+<body>
+
+  <form>
+    <h2>Đăng ký</h2>
+    <div>
+      <label for="fullname">Họ và tên:</label>
+      <input type="text" id="fullname" name="fullname">
+      <p class="error-message" id="fullname-error"></p>
+    </div>
+    <div>
+      <label for="reg-email">Email:</label>
+      <input type="email" id="reg-email" name="email">
+      <p class="error-message" id="reg-email-error"></p>
+    </div>
+    <div>
+      <label for="reg-password">Mật khẩu:</label>
+      <input type="password" id="reg-password" name="password">
+      <p class="error-message" id="reg-password-error"></p>
+    </div>
+    <div>
+      <label for="confirm-password">Nhập lại mật khẩu:</label>
+      <input type="password" id="confirm-password" name="confirm-password">
+      <p class="error-message" id="confirm-password-error"></p>
+    </div>
+    <button type="submit">Đăng ký</button>
+    <p>Đã có tài khoản? <a href="login.html">Đăng nhập</a></p>
+  </form>
+
+  <script>
+    const fullnameInput = document.getElementById('fullname');
+    const regEmailInput = document.getElementById('reg-email');
+    const regPasswordInput = document.getElementById('reg-password');
+    const confirmPasswordInput = document.getElementById('confirm-password');
+    const errorMessages = document.querySelectorAll('.error-message');
+    
+    function displayError(input, message) {
+      const errorMessage = input.nextElementSibling;
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+    }
+    
+    function hideError(input) {
+      const errorMessage = input.nextElementSibling;
+      errorMessage.textContent = '';
+      errorMessage.style.display = 'none';
+    }
+
+    function validateForm() {
+      let isValid = true;
+      if (fullnameInput.value === '') {
+        displayError(fullnameInput, 'Vui lòng nhập họ và tên');
+        isValid = false;
+      } else {
+        hideError(fullnameInput);
+      }
+      if (regEmailInput.value === '') {
+        displayError(regEmailInput, 'Vui lòng nhập email');
+        isValid = false;
+      } else {
+        const regex = /^\S+@\S+\.\S{2,}$/;
+        if (!regex.test(regEmailInput.value)) {
+          displayError(regEmailInput, 'Email không hợp lệ');
+          isValid = false;
+        } else {
+          hideError(regEmailInput);
+        }
+      }
+      if (regPasswordInput.value === '') {
+        displayError(regPasswordInput, 'Vui lòng nhập mật khẩu');
+        isValid = false;
+      } else {
+        hideError(regPasswordInput);
+      }
+      if (confirmPasswordInput.value === '') {
+        displayError(confirmPasswordInput, 'Vui lòng nhập lại mật khẩu');
+        isValid = false;
+      } else if (regPasswordInput.value !== confirmPasswordInput.value) {
+        displayError(confirmPasswordInput, 'Mật khẩu nhập lại không trùng khớp');
+        isValid = false;
+      } else {
+        hideError(confirmPasswordInput);
+      }
+      return isValid;
+    }
+
+    document.querySelector('form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (validateForm()) {
+        const registrationData = {
+          fullName: fullnameInput.value,
+          email: regEmailInput.value,
+          password: regPasswordInput.value
+        };
+        fetch('YOUR_BACKEND_REGISTRATION_URL', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(registrationData)
+          })
+          .then(response => {
+            if (response.ok) {
+              console.log('Đăng ký thành công!');
+            } else {
+              console.error('Đăng ký thất bại!');
+            }
+          })
+          .catch(error => {
+            console.error('Đăng ký thất bại:', error);
+          })
+          .finally(() => {
+            fullnameInput.value = '';
+            regEmailInput.value = '';
+            regPasswordInput.value = '';
+            confirmPasswordInput.value = '';
+          });
+      }
+    });
+  </script>
+
+</body>
+
+</html>
